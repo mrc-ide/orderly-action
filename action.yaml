@@ -1,0 +1,26 @@
+name: 'orderly'
+description: 'Action to configure an orderly workflow.'
+inputs:
+  packit-url:
+    description: "URL of a packit instance to be configured as a remote location"
+    required: false
+
+  location-name:
+    description: "The name to use when adding the location"
+    default: "packit"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        packages: cli, httr2, orderly2
+
+    - name: Install orderly2
+      shell: bash
+      run: Rscript --verbose '${{ github.action_path }}/orderly-init.R'
+
+    - name: Logging in to Packit
+      if: ${{ inputs.packit-url != null }}
+      shell: bash
+      run: Rscript --verbose '${{ github.action_path }}/packit-login.R' '${{ inputs.location-name }}' '${{ inputs.packit-url }}'

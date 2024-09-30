@@ -1,0 +1,33 @@
+name: "Self-test"
+on:
+  - push
+  - pull_request
+
+jobs:
+  self-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+          extra-repositories: https://mrc-ide.r-universe.dev
+      - uses: ./
+        with:
+          packit-url: https://packit.dide.ic.ac.uk/reside
+      - run: |
+          orderly2::orderly_new("orderly-action-self-test")
+          id <- orderly2::orderly_run("orderly-action-self-test")
+          orderly2::orderly_location_push(id, "packit")
+
+        shell: Rscript {0}
