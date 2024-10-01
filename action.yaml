@@ -15,6 +15,7 @@ runs:
     - uses: r-lib/actions/setup-r-dependencies@v2
       with:
         packages: cli, httr2, orderly2
+        dependencies: NA
 
     - name: Install orderly2
       shell: bash
